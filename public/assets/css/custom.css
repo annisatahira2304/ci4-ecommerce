@@ -1,0 +1,101 @@
+body{
+    font-family: 'Poppins', sans-serif;
+    background: #f4f7fe;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width: 250px;
+    min-height: 100vh;
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    position: fixed;
+}
+
+.sidebar .logo{
+    font-size: 28px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+.sidebar .nav-link{
+    color: #555;
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    transition: 0.3s;
+}
+
+.sidebar .nav-link:hover{
+    background: #2563eb;
+    color: white;
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link.active{
+    background: #2563eb;
+    color: white;
+}
+
+/* CONTENT */
+.main-content{
+    margin-left: 260px;
+    padding: 30px;
+}
+
+/* NAVBAR */
+.topbar{
+    background: white;
+    padding: 15px 20px;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+/* CARD */
+.dashboard-card{
+    border: none;
+    border-radius: 20px;
+    padding: 25px;
+    background: white;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    transition: 0.3s;
+}
+
+.dashboard-card:hover{
+    transform: translateY(-5px);
+}
+
+.dashboard-icon{
+    font-size: 35px;
+    color: #2563eb;
+}
+
+/* SEARCH */
+.search-box{
+    border-radius: 12px;
+    border: 1px solid #ddd;
+}
+
+/* PROFILE */
+.profile-img{
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+    .sidebar{
+        width: 80px;
+    }
+
+    .sidebar .nav-link span{
+        display:none;
+    }
+
+    .main-content{
+        margin-left: 90px;
+    }
+}
