@@ -2,59 +2,44 @@
 
 namespace App\Controllers;
 
+use App\Models\UserModel;
+
 class AuthController extends BaseController
 {
+    protected $userModel;
+
     public function __construct()
     {
         helper('form');
+        $this->userModel = new UserModel();
     }
 
     public function login()
     {
-        // Jika belum submit form
-        if(!$this->request->getPost())
-        {
+        if (!$this->request->getPost()) {
             return view('v_login');
         }
 
-        // Data user dummy
-        $dataUser = [
-            'username' => 'april',
-            'password' => md5('123'),
-            'role'     => 'admin'
-        ];
-
-        // Ambil input user
         $username = $this->request->getPost('username');
-        $password = md5($this->request->getPost('password'));
+        $password = $this->request->getPost('password');
 
-        // Cek username
-        if($username != $dataUser['username'])
-        {
-            session()->setFlashdata(
-                'failed',
-                'Username tidak ditemukan'
-            );
+        $dataUser = $this->userModel->where('username', $username)->first();
 
+        if (!$dataUser) {
+            session()->setFlashdata('failed', 'Username tidak ditemukan');
             return redirect()->to('/login');
         }
 
-        // Cek password
-        if($password != $dataUser['password'])
-        {
-            session()->setFlashdata(
-                'failed',
-                'Username & Password salah'
-            );
-
+        if (!password_verify($password, $dataUser['password'])) {
+            session()->setFlashdata('failed', 'Username & Password salah');
             return redirect()->to('/login');
         }
 
-        // Simpan session login
         session()->set([
-            'username' => $dataUser['username'],
-            'role'     => $dataUser['role'],
-            'logged_in'=> true
+            'id'        => $dataUser['id'],
+            'username'  => $dataUser['username'],
+            'role'      => $dataUser['role'],
+            'logged_in' => true,
         ]);
 
         return redirect()->to('/');
@@ -63,7 +48,6 @@ class AuthController extends BaseController
     public function logout()
     {
         session()->destroy();
-
         return redirect()->to('/login');
     }
 }

@@ -1,52 +1,71 @@
-<?php $uri = service('uri'); ?>
+<!-- ======================
+     SIDEBAR
+====================== -->
 
-<div class="sidebar p-3">
+<div class="sidebar">
 
-    <h4 class="fw-bold text-primary">
-        <i class="bi bi-shop"></i> Toko Defani
-    </h4>
+    <h3 class="logo">
+        <i class="bi bi-shop"></i>
+        <span>Buah Tangan Gaharu</span>
+    </h3>
 
-    <hr>
+    <ul class="nav flex-column">
 
-    <ul class="nav flex-column mt-4">
-
+        <!-- HOME -->
         <li class="nav-item">
-            <a class="nav-link <?= ($uri->getSegment(1) == '') ? 'active' : '' ?>"
-                href="/">
-
-                <i class="bi bi-house-door-fill me-2"></i>
-                Home
-
+            <a href="<?= base_url('/') ?>"
+                class="nav-link <?= uri_string() == '' ? 'active' : '' ?>">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Home</span>
             </a>
         </li>
 
+        <!-- PRODUK -->
         <li class="nav-item">
-            <a class="nav-link <?= ($uri->getSegment(1) == 'keranjang') ? 'active' : '' ?>"
-                href="/keranjang">
-
-                <i class="bi bi-cart-fill me-2"></i>
-                Keranjang
-
+            <a href="<?= base_url('produk') ?>"
+                class="nav-link <?= uri_string() == 'produk' ? 'active' : '' ?>">
+                <i class="bi bi-box-seam"></i>
+                <span>Produk</span>
             </a>
         </li>
 
+        <!-- KERANJANG -->
         <li class="nav-item">
-            <a class="nav-link <?= ($uri->getSegment(1) == 'produk') ? 'active' : '' ?>"
-                href="/produk">
-
-                <i class="bi bi-box-seam me-2"></i>
-                Produk
-
+            <a href="<?= base_url('cart') ?>"
+                class="nav-link <?= uri_string() == 'cart' ? 'active' : '' ?>">
+                <i class="bi bi-cart3"></i>
+                <span>Keranjang</span>
             </a>
         </li>
 
+        <?php if (session()->get('role') == 'admin') : ?>
+
+        <!-- LAPORAN PENDAPATAN (ADMIN ONLY) -->
         <li class="nav-item">
-            <a class="nav-link <?= ($uri->getSegment(1) == 'kontak') ? 'active' : '' ?>"
-                href="/kontak">
+            <a href="<?= base_url('laporan/pendapatan') ?>"
+                class="nav-link <?= uri_string() == 'laporan/pendapatan' ? 'active' : '' ?>">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span>Laporan Pendapatan</span>
+            </a>
+        </li>
 
-                <i class="bi bi-person-fill me-2"></i>
-                Profile
+        <!-- PENJUALAN (ADMIN ONLY) -->
+        <li class="nav-item">
+            <a href="<?= base_url('penjualan') ?>"
+                class="nav-link <?= uri_string() == 'penjualan' ? 'active' : '' ?>">
+                <i class="bi bi-receipt"></i>
+                <span>Penjualan</span>
+            </a>
+        </li>
 
+        <?php endif; ?>
+
+        <!-- PROFIL -->
+        <li class="nav-item">
+            <a href="<?= base_url('profil') ?>"
+                class="nav-link <?= uri_string() == 'profil' ? 'active' : '' ?>">
+                <i class="bi bi-person-fill"></i>
+                <span>Profil</span>
             </a>
         </li>
 

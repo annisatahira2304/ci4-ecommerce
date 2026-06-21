@@ -40,34 +40,6 @@
     </div>
 </div>
 
-<!-- STATISTIK -->
-<div class="row mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card-custom text-center">
-            <h2 class="fw-bold mb-2" style="color:#A15C2F;">120+</h2>
-            <p class="text-muted mb-0">Produk</p>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card-custom text-center">
-            <h2 class="fw-bold mb-2" style="color:#A15C2F;">85+</h2>
-            <p class="text-muted mb-0">Pesanan</p>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card-custom text-center">
-            <h2 class="fw-bold mb-2" style="color:#A15C2F;">20+</h2>
-            <p class="text-muted mb-0">Stok Menipis</p>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card-custom text-center">
-            <h2 class="fw-bold mb-2" style="color:#A15C2F;">Rp 12 JT</h2>
-            <p class="text-muted mb-0">Penjualan</p>
-        </div>
-    </div>
-</div>
-
 <!-- KATEGORI -->
 <h3 class="fw-bold mb-4" style="color:#8B4513; font-family: 'Playfair Display', serif;">
     Kategori Produk

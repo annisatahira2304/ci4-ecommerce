@@ -9,16 +9,16 @@ class ProdukController extends BaseController
     public function index()
     {
         $produkModel = new ProdukModel();
+        $search = $this->request->getGet('search');
 
-        // Ditambahkan fallback ?? [] agar aman jika database kosong
+        if ($search) {
+            $produkModel->like('nama', $search);
+        }
+
         $data['produk'] = $produkModel->findAll() ?? [];
+        $data['search'] = $search;
 
         return view('produk', $data);
-    }
-
-    public function create()
-    {
-        return view('tambah_produk');
     }
 
     public function store()
@@ -90,6 +90,22 @@ class ProdukController extends BaseController
 
         // Ditambahkan flashdata 'success' untuk pop-up edit berhasil
         return redirect()->to('/produk')->with('success', 'Data produk berhasil diperbarui!');
+    }
+
+    public function download()
+    {
+        if (session()->get('role') != 'admin') {
+            return redirect()->to('/');
+        }
+
+        $produkModel = new ProdukModel();
+        $produk = $produkModel->findAll();
+
+        $dompdf = new \Dompdf\Dompdf();
+        $html = view('produk_pdf', ['produk' => $produk]);
+        $dompdf->loadHtml($html);
+        $dompdf->render();
+        $dompdf->stream("data-produk.pdf");
     }
 
     public function delete($id)

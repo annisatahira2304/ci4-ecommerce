@@ -154,6 +154,9 @@
             border: none;
             background: #fff4eb;
             color: var(--primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             transition: 0.3s;
         }
 
@@ -306,210 +309,42 @@
                 justify-content: space-between;
             }
         }
+
+        #cartBadge {
+            position: absolute !important;
+            top: -6px !important;
+            right: -6px !important;
+            min-width: 18px !important;
+            width: auto !important;
+            height: 18px !important;
+            border-radius: 50% !important;
+            background-color: #dc3545 !important;
+            color: #fff !important;
+            font-size: 11px !important;
+            line-height: 1 !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border: 2px solid #F9F6F2 !important;
+            padding: 0 3px !important;
+            transform: none !important;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- ======================
-         SIDEBAR
-    ====================== -->
-
-    <div class="sidebar">
-
-        <h3 class="logo">
-            <i class="bi bi-shop"></i>
-            <span>Buah Tangan Gaharu</span>
-        </h3>
-
-        <ul class="nav flex-column">
-
-            <!-- HOME -->
-
-            <li class="nav-item">
-                <a href="<?= base_url('/') ?>"
-                    class="nav-link <?= uri_string() == '' ? 'active' : '' ?>">
-
-                    <i class="bi bi-house-door-fill"></i>
-                    <span>Home</span>
-
-                </a>
-            </li>
-
-            <!-- PRODUK -->
-
-            <li class="nav-item">
-                <a href="<?= base_url('produk') ?>"
-                    class="nav-link <?= uri_string() == 'produk' ? 'active' : '' ?>">
-
-                    <i class="bi bi-box-seam"></i>
-                    <span>Produk</span>
-
-                </a>
-            </li>
-
-            <!-- KERANJANG -->
-
-            <li class="nav-item">
-                <a href="<?= base_url('cart') ?>" class="nav-link">
-
-    <i class="bi bi-cart3"></i>
-
-    Keranjang
-
-</a>
-
-            <!-- KONTAK -->
-
-            <li class="nav-item">
-                <a href="<?= base_url('kontak') ?>"
-                    class="nav-link <?= uri_string() == 'kontak' ? 'active' : '' ?>">
-
-                    <i class="bi bi-person-fill"></i>
-                    <span>Kontak</span>
-
-                </a>
-            </li>
-
-        </ul>
-
-    </div>
-
-    <!-- ======================
-         MAIN CONTENT
-    ====================== -->
+    <?= $this->include('layout/sidebar') ?>
 
     <div class="main-content">
 
-        <!-- TOPBAR -->
-
-        <div class="topbar d-flex justify-content-between align-items-center">
-
-            <!-- LEFT -->
-
-            <div class="search-area d-flex align-items-center gap-3">
-
-                <button class="icon-btn">
-                    <i class="bi bi-list"></i>
-                </button>
-
-                <input type="text"
-    class="form-control search-box"
-    placeholder="Cari produk bakery..."
-    style="width:420px;">
-
-            </div>
-
-            <!-- RIGHT -->
-
-            <div class="topbar-right d-flex align-items-center gap-3">
-
-    <button class="icon-btn">
-        <i class="bi bi-bell"></i>
-    </button>
-
-    <button class="icon-btn position-relative" data-bs-toggle="modal" data-bs-target="#cartModalGlobal">
-        <i class="bi bi-cart3"></i>
-        <?php 
-        // Hitung total item di session keranjang jika ada
-        $sessionCart = session()->get('cart') ?? [];
-        $totalItems = is_array($sessionCart) ? count($sessionCart) : 0;
-        if ($totalItems > 0) : 
-        ?>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px; padding: 4px 6px;">
-                <?= $totalItems ?>
-            </span>
-        <?php endif; ?>
-    </button>
-
-                <div class="d-flex align-items-center gap-2">
-
-                   <img src="<?= base_url('assets/img/admin.jpg') ?>"
-                        class="profile-img">
-
-                    <div>
-                        <div class="fw-semibold" style="font-size:14px;">
-                            Admin
-                        </div>
-
-                        <small class="text-muted">
-                            Administrator
-                        </small>
-                    </div>
-
-                </div>
-
-                <a href="<?= base_url('logout') ?>"
-   class="btn btn-outline-danger rounded-4 px-3">
-                    Logout
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- PAGE CONTENT -->
+        <?= $this->include('layout/navbar') ?>
 
         <?= $this->renderSection('content') ?>
 
-        <!-- FOOTER -->
-
-        <footer>
-            © <?= date('Y') ?> Buah Tangan Gaharu.
-            All Rights Reserved.
-        </footer>
+        <?= $this->include('layout/footer') ?>
 
     </div>
 
-    <!-- BOOTSTRAP JS -->
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<div class="modal fade" id="cartModalGlobal" tabindex="-1" aria-labelledby="cartModalGlobalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="border-radius: 20px; background: #FCFAF7;">
-            <div class="modal-header border-0 px-4 pt-4">
-                <h5 class="modal-title fw-bold" id="cartModalGlobalLabel" style="color:#8B4513;">
-                    <i class="bi bi-cart3"></i> Keranjang Belanja
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body px-4 pb-4">
-                <?php if (!empty(session()->get('cart'))) : ?>
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle">
-                            <thead>
-                                <tr style="font-size: 13px; color: #8b7a70;">
-                                    <th>Produk</th>
-                                    <th>Qty</th>
-                                    <th>Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach (session()->get('cart') as $id => $item) : ?>
-                                    <tr style="font-size: 14px;">
-                                        <td><?= esc($item['nama'] ?? 'Produk') ?></td>
-                                        <td><?= $item['qty'] ?? 1 ?>x</td>
-                                        <td class="fw-semibold">Rp <?= number_format(($item['harga'] ?? 0) * ($item['qty'] ?? 1), 0, ',', '.') ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-grid mt-3">
-                        <a href="<?= base_url('cart') ?>" class="btn text-white rounded-3 btn-sm" style="background-color: var(--primary);">
-                            Lihat Detail & Checkout
-                        </a>
-                    </div>
-                <?php else : ?>
-                    <div class="text-center py-4 text-muted">
-                        <i class="bi bi-cart-x fs-2 d-block mb-2" style="color: var(--secondary);"></i>
-                        Keranjangmu masih kosong nih.
-                    </div>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 
 </html>

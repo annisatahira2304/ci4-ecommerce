@@ -6,19 +6,15 @@ use CodeIgniter\Model;
 
 class TransactionModel extends Model
 {
-    protected $table = 'transactions';
+    protected $table            = 'transactions';
+    protected $primaryKey       = 'id';
+    protected $allowedFields    = ['kode_transaksi', 'username', 'nama_penerima', 'telepon', 'total_harga', 'alamat', 'ongkir', 'status', 'bukti_pembayaran'];
+    protected $useTimestamps    = true;
+    protected $createdField     = 'created_at';
+    protected $updatedField     = 'updated_at';
 
-    protected $primaryKey = 'id';
-
-    protected $allowedFields = [
-
-    'kode_transaksi',
-    'nama_penerima',
-    'telepon',
-    'alamat',
-    'ongkir',
-    'total_harga'
-];
-
-    protected $useTimestamps = true;
+    public function updateStatus($id, $status)
+    {
+        return $this->update($id, ['status' => $status]);
+    }
 }

@@ -215,7 +215,7 @@
 
                 </h2>
 
-                <a href="<?= base_url('checkout') ?>"
+                <a href="#" data-bs-toggle="modal" data-bs-target="#checkoutModal"
                     class="btn btn-success px-4 py-2 rounded-pill">
 
                     <i class="bi bi-credit-card"></i>

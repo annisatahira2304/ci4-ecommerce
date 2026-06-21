@@ -14,10 +14,9 @@ class CheckoutController extends BaseController
         $cartModel = new CartModel();
         $produkModel = new ProdukModel();
 
-        $cart = $cartModel->findAll();
+        $cart = $cartModel->where('user_id', session()->get('id'))->findAll();
 
         foreach ($cart as $key => $item) {
-
             $cart[$key]['produk'] =
                 $produkModel->find($item['product_id']);
         }
@@ -27,100 +26,129 @@ class CheckoutController extends BaseController
         ]);
     }
 
+    public function getCheckoutPartial()
+    {
+        $cartModel = new CartModel();
+        $produkModel = new ProdukModel();
+
+        $cart = $cartModel->where('user_id', session()->get('id'))->findAll();
+
+        if (empty($cart)) {
+            return '<div class="text-center py-4 text-muted">Keranjang kosong.</div>';
+        }
+
+        foreach ($cart as $key => $item) {
+            $cart[$key]['produk'] = $produkModel->find($item['product_id']);
+        }
+
+        return view('checkout_partial', ['cart' => $cart]);
+    }
+
+    private function getCheckoutTotal($cart)
+    {
+        $total = 0;
+        foreach ($cart as $c) {
+            $p = (new ProdukModel())->find($c['product_id']);
+            if ($p) $total += $p['harga'] * $c['qty'];
+        }
+        return $total;
+    }
+
     public function store()
-{
-    $cartModel = new CartModel();
-    $produkModel = new ProdukModel();
+    {
+        $cartModel = new CartModel();
+        $produkModel = new ProdukModel();
+        $transactionModel = new TransactionModel();
+        $detailModel = new TransactionDetailModel();
 
-    $transactionModel = new TransactionModel();
-    $detailModel = new TransactionDetailModel();
+        $cart = $cartModel->where('user_id', session()->get('id'))->findAll();
 
-    $cart = $cartModel->findAll();
+        if (empty($cart)) {
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['success' => false, 'message' => 'Keranjang kosong.']);
+            }
+            return redirect()->to('/cart');
+        }
 
-    if (empty($cart)) {
+        // Validasi
+        $errors = [];
+        $nama   = $this->request->getPost('nama_penerima');
+        $telp   = $this->request->getPost('telepon');
+        $alamat = $this->request->getPost('alamat');
+        $prov   = $this->request->getPost('provinsi');
+        $kota   = $this->request->getPost('kota');
+        $kurir  = $this->request->getPost('kurir');
+        $layanan = $this->request->getPost('layanan');
 
-        return redirect()->to('/cart');
-    }
+        if (!$nama) $errors[] = 'Nama penerima harus diisi.';
+        if (!$telp) $errors[] = 'Telepon harus diisi.';
+        if (!$alamat) $errors[] = 'Alamat harus diisi.';
+        if (!$prov) $errors[] = 'Pilih provinsi.';
+        if (!$kota) $errors[] = 'Pilih kota.';
+        if (!$kurir) $errors[] = 'Pilih kurir.';
+        if (!$layanan) $errors[] = 'Pilih layanan pengiriman.';
 
-    $total = 0;
+        if (!empty($errors)) {
+            $msg = implode(' ', $errors);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['success' => false, 'message' => $msg]);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
 
-    foreach ($cart as $item) {
+        // Cek stok
+        $stockErrors = [];
+        foreach ($cart as $item) {
+            $produk = $produkModel->find($item['product_id']);
+            if ($produk && $item['qty'] > $produk['stok']) {
+                $stockErrors[] = $produk['nama'] . ' hanya tersedia ' . $produk['stok'] . ' pcs.';
+            }
+        }
+        if (!empty($stockErrors)) {
+            $msg = implode(' ', $stockErrors);
+            if ($this->request->isAJAX()) {
+                return $this->response->setJSON(['success' => false, 'message' => $msg]);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
 
-        $produk = $produkModel->find(
-            $item['product_id']
-        );
+        $kodeTransaksi = 'INV-' . date('YmdHis');
+        $ongkir = (int) ($this->request->getPost('ongkir') ?? 0);
+        $total  = $this->getCheckoutTotal($cart) + $ongkir;
 
-        $total +=
-            $produk['harga']
-            * $item['qty'];
-    }
-
-    // sementara ongkir simulasi
-
-    $ongkir = 15000;
-
-    // kode invoice
-
-    $kode = 'INV-' . date('YmdHis');
-
-    // simpan transaksi
-
-    $transactionModel->save([
-
-        'kode_transaksi' => $kode,
-
-        'nama_penerima' =>
-            $this->request->getPost('nama_penerima'),
-
-        'telepon' =>
-            $this->request->getPost('telepon'),
-
-        'alamat' =>
-            $this->request->getPost('alamat'),
-
-        'ongkir' =>
-            $ongkir,
-
-        'total_harga' =>
-            $total + $ongkir
-
-    ]);
-
-    $transactionId =
-        $transactionModel->getInsertID();
-
-    // simpan detail transaksi
-
-    foreach ($cart as $item) {
-
-        $produk = $produkModel->find(
-            $item['product_id']
-        );
-
-        $subtotal =
-            $produk['harga']
-            * $item['qty'];
-
-        $detailModel->save([
-
-            'transaction_id' =>
-                $transactionId,
-
-            'product_id' =>
-                $produk['id'],
-
-            'jumlah' =>
-                $item['qty'],
-
-            'subtotal' =>
-                $subtotal
+        $transactionId = $transactionModel->insert([
+            'kode_transaksi' => $kodeTransaksi,
+            'username'       => session()->get('username'),
+            'nama_penerima'  => $nama,
+            'telepon'        => $telp,
+            'total_harga'    => $total,
+            'alamat'         => $alamat,
+            'ongkir'         => $ongkir,
+            'status'         => 0,
         ]);
+
+        foreach ($cart as $item) {
+            $produk = $produkModel->find($item['product_id']);
+            $subtotal = $produk['harga'] * $item['qty'];
+            $detailModel->insert([
+                'transaction_id' => $transactionId,
+                'product_id'     => $produk['id'],
+                'jumlah'         => $item['qty'],
+                'subtotal'       => $subtotal,
+            ]);
+        }
+
+        $cartModel->where('user_id', session()->get('id'))->delete();
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success'        => true,
+                'transaction_id' => $transactionId,
+                'kode_transaksi' => $kodeTransaksi,
+                'total'          => $total,
+            ]);
+        }
+
+        return redirect()->to('/profil')->with('success', 'Pesanan berhasil dibuat!');
     }
-
-    // kosongkan keranjang
-
-    $cartModel->truncate();
-
-    return redirect()->to('/checkout/success');
-}
 }

@@ -108,32 +108,30 @@ $(document).ready(function() {
         type: "GET",
         dataType: "json",
         success: function(response) {
-            let res = JSON.parse(response);
-            if(res.rajaongkir.status.code === 200) {
-                let data = res.rajaongkir.results;
-                $.each(data, function(key, value) {
-                    $('#provinsi').append(`<option value="${value.province_id}">${value.province}</option>`);
+            if(response.length > 0) {
+                $.each(response, function(key, value) {
+                    $('#provinsi').append(`<option value="${value.id}">${value.name}</option>`);
                 });
             }
         }
     });
 
-    // 2. LOAD KOTA JIKA PROVINSI DIPILIH
+    // 2. LOAD KOTA BERDASARKAN NAMA PROVINSI (search-based)
     $('#provinsi').on('change', function() {
-        let id_provinsi = $(this).val();
+        let provinsiNama = $('#provinsi option:selected').text();
         $('#kota').html('<option value="">⏳ Loading Kota...</option>');
         
-        if(id_provinsi) {
+        if(provinsiNama && provinsiNama != '-- Pilih Provinsi --') {
             $.ajax({
-                url: "<?= base_url('api/kota') ?>/" + id_provinsi,
+                url: "<?= base_url('get-location') ?>",
                 type: "GET",
                 dataType: "json",
+                data: { search: provinsiNama },
                 success: function(response) {
-                    let res = JSON.parse(response);
                     let html = '<option value="">-- Pilih Kota --</option>';
-                    if(res.rajaongkir.status.code === 200) {
-                        $.each(res.rajaongkir.results, function(key, value) {
-                            html += `<option value="${value.city_id}">${value.type} ${value.city_name}</option>`;
+                    if(response.length > 0) {
+                        $.each(response, function(key, value) {
+                            html += `<option value="${value.id}">${value.label}</option>`;
                         });
                     }
                     $('#kota').html(html);
@@ -160,19 +158,15 @@ $(document).ready(function() {
                     courier: kurir
                 },
                 success: function(response) {
-                    let res = JSON.parse(response);
                     let html = '<option value="">-- Pilih Layanan --</option>';
-                    if(res.rajaongkir.status.code === 200) {
-                        let costs = res.rajaongkir.results[0].costs;
-                        if(costs.length > 0) {
-                            $.each(costs, function(key, val) {
-                                html += `<option value="${val.cost[0].value}">
-                                    ${val.service} - Rp ${val.cost[0].value.toLocaleString('id-ID')} (${val.cost[0].etd} Hari)
-                                </option>`;
-                            });
-                        } else {
-                            html = '<option value="">Layanan tidak tersedia</option>';
-                        }
+                    if(response.length > 0) {
+                        $.each(response, function(key, val) {
+                            html += `<option value="${val.cost}">
+                                ${val.service} - Rp ${val.cost.toLocaleString('id-ID')} (${val.etd} Hari)
+                            </option>`;
+                        });
+                    } else {
+                        html = '<option value="">Layanan tidak tersedia</option>';
                     }
                     $('#layanan').html(html);
                 }

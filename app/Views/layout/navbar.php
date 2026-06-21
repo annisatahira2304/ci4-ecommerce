@@ -1,42 +1,60 @@
-<div class="topbar d-flex justify-content-between align-items-center px-4">
+<!-- TOPBAR -->
 
-    <div class="d-flex align-items-center gap-3">
+<div class="topbar d-flex justify-content-between align-items-center">
 
-        <i class="bi bi-list fs-4 text-primary"></i>
+    <!-- LEFT -->
 
-        <div class="input-group">
+    <div class="search-area d-flex align-items-center gap-3">
 
-            <input type="text"
-                class="form-control"
-                placeholder="Search">
+        <button class="icon-btn">
+            <i class="bi bi-list"></i>
+        </button>
 
-            <span class="input-group-text">
-                <i class="bi bi-search"></i>
-            </span>
+        <form action="<?= base_url('produk') ?>" method="GET" class="d-flex">
+            <input type="text" name="search"
+class="form-control search-box"
+placeholder="Cari produk bakery..."
+style="width:420px;"
+value="<?= esc(service('request')->getGet('search') ?? '') ?>">
+        </form>
 
-        </div>
     </div>
 
-    <div class="d-flex align-items-center gap-4">
+    <!-- RIGHT -->
 
-        <i class="bi bi-bell fs-5 text-primary"></i>
+    <div class="topbar-right d-flex align-items-center gap-3">
 
-        <div class="d-flex align-items-center">
+<button class="icon-btn">
+    <i class="bi bi-bell"></i>
+</button>
 
-            <img src="https://i.pravatar.cc/40"
-                class="rounded-circle me-2">
+<a href="#" data-bs-toggle="modal" data-bs-target="#cartModal" class="icon-btn position-relative text-decoration-none">
+    <i class="bi bi-cart3"></i>
+    <span id="cartBadge" style="display: none;">0</span>
+</a>
 
-            <span class="fw-bold text-secondary">
-                <?= session()->get('username') ?>
-            </span>
+        <div class="d-flex align-items-center gap-2">
 
-            <a href="/logout"
-                class="btn btn-danger btn-sm ms-3">
+           <img src="<?= base_url('assets/img/admin.jpg') ?>"
+                 class="profile-img">
 
-                Logout
+            <div>
+                <div class="fw-semibold" style="font-size:14px;">
+                    <?= esc(session()->get('username') ?? 'Guest') ?>
+                </div>
 
-            </a>
+                <small class="text-muted">
+                    <?= session()->get('role') == 'admin' ? 'Administrator' : 'Customer' ?>
+                </small>
+            </div>
 
         </div>
+
+        <a href="<?= base_url('logout') ?>"
+class="btn btn-outline-danger rounded-4 px-3">
+            Logout
+        </a>
+
     </div>
+
 </div>
